@@ -86,6 +86,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
+                }).to.throw(Error);
+            });
+
             it('works when you give it an object', function () {
                 expect(wrapped({ test: 1 })).to.equal(1);
                 expect(wrapped({ test: true })).to.be.ok;
@@ -151,6 +157,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
+                }).to.throw(Error);
+            });
+
             it('works when you give it a number', function () {
                 expect(wrapped(12)).to.equal(12);
                 expect(wrapped(32.8)).to.equal(32.8);
@@ -213,6 +225,12 @@ describe('argue', function () {
             it('throws an error when a date is given', function () {
                 expect(function () {
                     wrapped(new Date());
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
                 }).to.throw(Error);
             });
 
@@ -349,6 +367,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
+                }).to.throw(Error);
+            });
+
             it('works when a boolean is given', function () {
                 expect(wrapped(true)).to.equal(true);
                 expect(wrapped(false)).to.equal(false);
@@ -418,9 +442,137 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
+                }).to.throw(Error);
+            });
+
             it('works when a date is given', function () {
                 var date = new Date();
                 expect(wrapped(date)).to.equal(date);
+            });
+        });
+
+        describe('string', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('string', function (d) { 
+                    return d;
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when an object is given', function () {
+                expect(function () {
+                    wrapped({});
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a number', function () {
+                expect(function () {
+                    wrapped(12); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(32.8);
+                }).to.throw(Error);
+            });
+
+            it('throws and error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped([1,2]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a function is given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date())
+                }).to.throw(Error);
+            });
+
+            it('works with a string', function () {
+                expect(wrapped('test')).to.equal('test');
+            });
+
+            it('works with a null', function () {
+                expect(wrapped(null)).to.equal(null);
+            });
+        });
+
+        describe('any', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('any', function (d) { 
+                    if (typeof d === 'function') {
+                        return d();
+                    }
+                    return d;
+                });
+            });
+
+            it('works when you give it an object', function () {
+                expect(wrapped({ test: 1 })).to.eql({ test: 1 });
+                expect(wrapped({ test: true })).to.eql({ test: true });
+            });
+
+            it('works when you give it a number', function () {
+                expect(wrapped(12)).to.equal(12);
+                expect(wrapped(32.8)).to.equal(32.8);
+            });
+
+            it('works when you give it an array', function () {
+                expect(wrapped([])).to.eql([]);
+                expect(wrapped([1,2])).to.eql([1,2]);
+            });
+
+            it('works when a function is given', function () {
+                expect(wrapped(function () { return 42; })).to.equal(42);
+            });
+
+            it('works when a boolean is given', function () {
+                expect(wrapped(true)).to.equal(true);
+                expect(wrapped(false)).to.equal(false);
+            });
+
+            it('works when a date is given', function () {
+                var date = new Date();
+                expect(wrapped(date)).to.equal(date);
+            });
+
+            it('works with a string', function () {
+                expect(wrapped('test')).to.equal('test');
+            });
+
+            it('works with a null', function () {
+                expect(wrapped(null)).to.equal(null);
             });
         });
     });
@@ -460,16 +612,106 @@ describe('argue', function () {
     });
 
     describe('quantifiers', function () {
-        describe('? makes the argument optional', function () {
+        describe('?', function () {
+            var wrapped = null;
 
+            beforeEach(function () {
+                wrapped = argue('string?', function (str) {
+                    return str;
+                });
+            });
+
+            it('allows the argument to not be given', function () {
+                expect(wrapped()).to.equal(undefined);
+            });
+
+            it('correctly passes the argument when 1 is given', function () {
+                expect(wrapped('test')).to.equal('test');
+            });
+
+            it('still relies on the pattern', function () {
+                expect(function () {
+                    wrapped(42);
+                }).to.throw(Error);
+            });
+
+            it('still worries about argument count', function () {
+                expect(function () {
+                    wrapped('test', 42);
+                }).to.throw(Error);
+            });
         });
 
-        describe('+ makes the pattern 1 to many arguments', function () {
+        describe('+', function () {
+            var wrapped = null;
 
+            beforeEach(function () {
+                wrapped = argue('string+', function (str) {
+                    return str;
+                });
+            });
+
+            it('requires an argument to be given', function () {
+                expect(function () {
+                    wrapped(); 
+                }).to.throw(Error);
+            });
+
+            it('correctly passes the argument when 1 is given', function () {
+                expect(wrapped('test')).to.equal('test');
+            });
+
+            it('correctly passes the argument when many is given', function () {
+                expect(wrapped('test', 'another', 'and', 'another'))
+                    .to.eql(['test', 'another', 'and', 'another']);
+            });
+
+            it('still relies on the pattern', function () {
+                expect(function () {
+                    wrapped(42);
+                }).to.throw(Error);
+            });
+
+            it('still worries about argument count', function () {
+                expect(function () {
+                    wrapped('test', 42);
+                }).to.throw(Error);
+            });
         });
 
-        describe('* makes the pattern 0 to many arguments', function () {
+        describe('*', function () {
+            var wrapped = null;
 
+            beforeEach(function () {
+                wrapped = argue('string*', function (str) {
+                    return str;
+                });
+            });
+
+            it('allows the argument to not be given', function () {
+                expect(wrapped()).to.equal(undefined);
+            });
+
+            it('correctly passes the argument when 1 is given', function () {
+                expect(wrapped('test')).to.equal('test');
+            });
+
+            it('correctly passes the argument when many is given', function () {
+                expect(wrapped('test', 'another', 'and', 'another'))
+                    .to.eql(['test', 'another', 'and', 'another']);
+            });
+
+            it('still relies on the pattern', function () {
+                expect(function () {
+                    wrapped(42);
+                }).to.throw(Error);
+            });
+
+            it('still worries about argument count', function () {
+                expect(function () {
+                    wrapped('test', 42);
+                }).to.throw(Error);
+            });
         });
     });
 });
