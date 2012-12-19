@@ -64,6 +64,22 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
             it('works when you give it an object', function () {
                 expect(wrapped({ test: 1 })).to.equal(1);
                 expect(wrapped({ test: true })).to.be.ok;
@@ -76,7 +92,7 @@ describe('argue', function () {
 
         describe('number', function () {
             var wrapped = null;
-            
+
             beforeEach(function () {
                 wrapped = argue('number', function (n) { 
                     return n;
@@ -107,10 +123,254 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
             it('works when you give it a number', function () {
                 expect(wrapped(12)).to.equal(12);
                 expect(wrapped(32.8)).to.equal(32.8);
             });
+        });
+
+        describe('array', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('array', function (arr) { 
+                    return arr.length;
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when an object is given', function () {
+                expect(function () {
+                    wrapped({});
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a function is given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a number', function () {
+                expect(function () {
+                    wrapped(12); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(32.8);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('works when you give it an array', function () {
+                expect(wrapped([])).to.equal(0);
+                expect(wrapped([1,2])).to.equal(2);
+            });
+        });
+
+        describe('function', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('function', function (func) { 
+                    return func();
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when an object is given', function () {
+                expect(function () {
+                    wrapped({});
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a number', function () {
+                expect(function () {
+                    wrapped(12); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(32.8);
+                }).to.throw(Error);
+            });
+
+            it('throws and error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped([1,2]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('works when a function is given', function () {
+                expect(wrapped(function () { return 42; })).to.equal(42);
+            });
+        });
+
+        describe('boolean', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('boolean', function (bl) { 
+                    return bl;
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when an object is given', function () {
+                expect(function () {
+                    wrapped({});
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a number', function () {
+                expect(function () {
+                    wrapped(12); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(32.8);
+                }).to.throw(Error);
+            });
+
+            it('throws and error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped([1,2]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a function is given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('works when a boolean is given', function () {
+                expect(wrapped(true)).to.equal(true);
+                expect(wrapped(false)).to.equal(false);
+            });
+        });
+    });
+    
+    describe('alternation', function () {
+        var wrapped = null;
+
+        beforeEach(function () {
+            wrapped = argue('object|number|function', function (n) {
+                return typeof n;
+            });
+        });
+
+        it('throws an error if one of the alternatives is an unknown pattern', function () {
+            expect(function () {
+                argue('object|randomCrap$@%|number', function () { } );
+            }).to.throw(Error);
+        });
+
+        it('allows any of the patterns', function () {
+            expect(wrapped({})).to.equal('object');
+            expect(wrapped(12)).to.equal('number');
+            expect(wrapped(function () { })).to.equal('function');
+        });
+
+        it('throws an error if none of the patterns match', function () {
+            expect(function () {
+                wrapped(true);
+            }).to.throw(Error);
+        });
+
+        it('throws an error if no arguments are given', function () {
+            expect(function () {
+                wrapped();
+            }).to.throw(Error);
+        });
+    });
+
+    describe('quantifiers', function () {
+        describe('? makes the argument optional', function () {
+
+        });
+
+        describe('+ makes the pattern 1 to many arguments', function () {
+
+        });
+
+        describe('* makes the pattern 0 to many arguments', function () {
+
         });
     });
 });

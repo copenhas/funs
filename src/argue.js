@@ -14,7 +14,7 @@ function getType(o) {
 function typeParser(/*forType, ... */) {
     var forTypes = argToArray(arguments);
 
-    return function (position, argsToParse, parsedArgs) {
+    var parser = function (position, argsToParse, parsedArgs) {
         var argType = getType(argsToParse[position]);
 
         if (forTypes.indexOf(argType) > -1) {
@@ -22,9 +22,37 @@ function typeParser(/*forType, ... */) {
             return 1;
         }
 
-        throw new Error('argue: was expecting an ' + forType + ' at position ' + 
+        throw new Error('argue: was expecting an ' + forTypes.join(', ') + ' at position ' + 
                         position + ' but got an ' + argType);
     };
+
+    parser.name = forTypes.join(', ');
+    return parser;
+}
+
+function alternation(parsers) {
+    var name = "";
+
+    name = parsers.map(function (parser) { return parser.name; }).join(' OR ');
+
+    var parser = function (position, argsToParse, parsedToArgs) {
+        for(var i = 0; i < parser.length; i++) {
+            try {
+                //return on the first one to succeed
+                return parsers[i](position, argsToParse, parsedToArgs);
+            } catch (e) {
+                if (e.message.indexOf('argue:') !== 0) {
+                    throw e;
+                }
+            }
+        }
+
+        throw new Error('argue: none of the alternatives matched, was expecting ' + 
+                        name + ' at position ' + position);
+    };
+
+    parser.name = name;
+    return parser;
 }
 
 var argue = function () {
@@ -37,13 +65,23 @@ var argue = function () {
 
     var argParsers = [];
     patterns.forEach(function (pattern) {
-        var parser = argue.types[pattern];
-        if (!parser) {
-            throw new Error('argue: invalid arguement pattern, "' + 
-                            pattern + '" is an unknown type');
-        }
+        var tokens = pattern.split('|');
+        var parsers = tokens.map(function (token) {
+            var parser = argue.types[token];
+            if (!parser) {
+                throw new Error('argue: invalid arguement pattern, "' + 
+                                token + '" is an unknown type');
+            }
 
-        argParsers.push(parser);
+            return parser;
+        });
+
+        if (parsers.length === 0) {
+            argParsers.push(parsers[0]);
+        }
+        else {
+            argParsers.push(alternation(parsers));
+        }
     });
 
     return function () {
@@ -67,7 +105,10 @@ var argue = function () {
 
 argue.types = {
     'object': typeParser('object', 'null'),
-    'number': typeParser('number')
+    'number': typeParser('number'),
+    'array': typeParser('array'),
+    'function': typeParser('function'),
+    'boolean': typeParser('boolean')
 };
 
 module.exports = argue;
