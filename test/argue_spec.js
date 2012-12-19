@@ -80,6 +80,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
+                }).to.throw(Error);
+            });
+
             it('works when you give it an object', function () {
                 expect(wrapped({ test: 1 })).to.equal(1);
                 expect(wrapped({ test: true })).to.be.ok;
@@ -139,6 +145,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
+                }).to.throw(Error);
+            });
+
             it('works when you give it a number', function () {
                 expect(wrapped(12)).to.equal(12);
                 expect(wrapped(32.8)).to.equal(32.8);
@@ -195,6 +207,12 @@ describe('argue', function () {
 
                 expect(function () {
                     wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
                 }).to.throw(Error);
             });
 
@@ -261,6 +279,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
+                }).to.throw(Error);
+            });
+
             it('works when a function is given', function () {
                 expect(wrapped(function () { return 42; })).to.equal(42);
             });
@@ -319,9 +343,84 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
+                }).to.throw(Error);
+            });
+
             it('works when a boolean is given', function () {
                 expect(wrapped(true)).to.equal(true);
                 expect(wrapped(false)).to.equal(false);
+            });
+        });
+        
+        describe('date', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('date', function (d) { 
+                    return d;
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when an object is given', function () {
+                expect(function () {
+                    wrapped({});
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a number', function () {
+                expect(function () {
+                    wrapped(12); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(32.8);
+                }).to.throw(Error);
+            });
+
+            it('throws and error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]); 
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped([1,2]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a function is given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('works when a date is given', function () {
+                var date = new Date();
+                expect(wrapped(date)).to.equal(date);
             });
         });
     });

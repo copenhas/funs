@@ -108,7 +108,8 @@ argue.types = {
     'number': typeParser('number'),
     'array': typeParser('array'),
     'function': typeParser('function'),
-    'boolean': typeParser('boolean')
+    'boolean': typeParser('boolean'),
+    'date': typeParser('date')
 };
 
 module.exports = argue;
