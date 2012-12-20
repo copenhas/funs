@@ -1,15 +1,23 @@
 {
     "name": "argue",
     "version": "0.0.1",
-    "description": "function building library that provides argument parsing and sanitation",
+    "description": "function building library that provides argument parsing and sanitization",
+    "keywords": ["arguments", "parser", "functions"],
     "main": "./src/argue",
-    "author": "Sean Copenhaver <sean.copenhaver@gmail.com>",
+    "author": {
+        "name": "Sean Copenhaver",
+        "email": "sean.copenhaver@gmail.com"
+    },
     "dependencies": {
     },
     "devDependencies": {
         "mocha": "1.7",
         "chai": "1.4"
     },
-    "engines": { "node": ">=0.8.8" },
-    "private": true
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/copenhas/argue.git"
+    },
+    "bugs": { "url": "https://github.com/copenhas/argue/issues" },
+    "engines": { "node": ">=0.8.8" }
 }
