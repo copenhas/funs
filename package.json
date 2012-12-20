@@ -1,6 +1,6 @@
 {
     "name": "argue",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "function building library that provides argument parsing and sanitization",
     "keywords": ["arguments", "parser", "functions"],
     "main": "./src/argue",
