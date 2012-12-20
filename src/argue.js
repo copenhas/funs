@@ -29,11 +29,11 @@ function typeParser(forType) {
             return 1;
         }
 
-        throw new Error('argue: was expecting an ' + parser.name + ' at position ' + 
+        throw new Error('argue: was expecting an ' + parser.desc + ' at position ' + 
                         position + ' but got an ' + argType);
     };
 
-    parser.name = forType;
+    parser.desc = forType;
     parser.type = forType;
     return parser;
 }
@@ -53,7 +53,7 @@ function callbackParser() {
         }
     };
 
-    parser.name = 'callback';
+    parser.desc = 'callback';
     parser.type = 'callback';
     return parser;
 }
@@ -119,20 +119,20 @@ function quantifierParser(begin, end) {
                 return consumedTotal;
             }
 
-            throw new Error("argue: was expected " + quantifier.name + 
+            throw new Error("argue: was expected " + quantifier.desc + 
                             " starting at position " + position);
         };
 
         quantifier.quantifier = true;
         quantifier.min = begin;
         quantifier.max = maxNumber;
-        quantifier.name = begin + " to " + (end || "many") + " of " + parser.name;
+        quantifier.desc = begin + " to " + (end || "many") + " of " + parser.desc;
         return quantifier;
     };
 }
 
 function alternation(parsers) {
-    var name = parsers.map(function (parser) { return parser.name; }).join(' OR ');
+    var desc = parsers.map(function (parser) { return parser.desc; }).join(' OR ');
 
     var alt = function (position, argsToParse, parsedToArgs) {
         for(var i = 0; i < parsers.length; i++) {
@@ -147,10 +147,10 @@ function alternation(parsers) {
         }
 
         throw new Error('argue: none of the alternatives matched, was expecting ' + 
-                        name + ' at position ' + position);
+                        desc + ' at position ' + position);
     };
 
-    alt.name = name;
+    alt.desc = desc;
     return alt;
 }
 
@@ -173,9 +173,9 @@ var argue = function (argPattern, func, opts) {
         hasCallback = false,
         callbackIndex = -1;
 
-    patterns.forEach(function (pattern) {
+    patterns.forEach(function (pattern, index) {
         var tokens = pattern.split('|');
-        var parsers = tokens.map(function (token, index) {
+        var parsers = tokens.map(function (token) {
             var lastChar = token.charAt(token.length - 1),
                 type = token,
                 quantifier = null,
@@ -251,7 +251,6 @@ var argue = function (argPattern, func, opts) {
 
             throw err;
         }
-
     };
 };
 

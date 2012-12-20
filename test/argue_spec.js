@@ -1148,5 +1148,15 @@ describe('argue', function () {
                 thisLib(function () { });
             }).to.not.throw();
         });
+        
+        it('async request with callback', function () {
+            var request = argue('string, callback', function (url, callback) {
+                throw new Error('something went wrong');
+            });
+
+            request('example.com', function (err, response) {
+                expect(err).is.a('error');
+            });
+        });
     });
 });
