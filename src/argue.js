@@ -45,7 +45,9 @@ function quantifierParser(begin, end) {
                 consumedStep = 0,
                 quantifierParsedArgs = [];
 
-            while (currentPosition < argsToParse.length) {
+            while (currentPosition < argsToParse.length && 
+                   maxNumber > quantifierParsedArgs.length) {
+
                 consumedStep = 0;
 
                 try {
@@ -66,7 +68,10 @@ function quantifierParser(begin, end) {
                     parsedToArgs.push(quantifierParsedArgs[0]);
                 } else if (quantifierParsedArgs.length > 1) {
                     parsedToArgs.push(quantifierParsedArgs);
+                } else if (begin === 0) {
+                    parsedToArgs.push(undefined);
                 }
+
                 return consumedTotal;
             }
 
@@ -152,11 +157,6 @@ var argue = function () {
 
     return function () {
         var argsPassedIn = argToArray(arguments);
-
-        if (argsPassedIn.length !== patterns.length && !startsWithAQuantifier) {
-            throw new Error('argue: incorrect number of arguments, was expecting ' + 
-                            patterns.length + ' but recieved ' + argsPassedIn.length);
-        }
 
         var parsedArgs = [],
             position = 0,

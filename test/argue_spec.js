@@ -33,7 +33,7 @@ describe('argue', function () {
         }).to.throw(Error);
     });
 
-    describe('basic type patterns', function () {
+    describe('types', function () {
         describe('object', function () {
             var wrapped = null;
             
@@ -639,6 +639,25 @@ describe('argue', function () {
                 expect(function () {
                     wrapped('test', 42);
                 }).to.throw(Error);
+            });
+
+            it('optionals can be at the beginning', function () {
+                var middle = argue('object?', 'function', function (opts, callback) {
+                    return callback(opts);
+                });
+
+                expect(middle(function (opts) { return opts; })).to.equal(undefined);
+                expect(middle({}, function (opts) { return opts; })).to.eql({});
+            });
+
+            it('optionals can be in the middle', function () {
+                var middle = argue('string', 'object?', 'function', 
+                function (str, opts, callback) {
+                    return callback(opts);
+                });
+
+                expect(middle('test', function (opts) { return opts; })).to.equal(undefined);
+                expect(middle('test', {}, function (opts) { return opts; })).to.eql({});
             });
         });
 
