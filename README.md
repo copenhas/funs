@@ -24,7 +24,7 @@ Here's a few examples:
 Here's what's supported:
 #### Types
 * `'object'` - matches an object but not null (use a 0 base quantifier if you want nully values)
-* `'number'` - matches any number
+* `'number'` - matches any number but not NaN (use a 0 base quantifier if you want nully values)
 * `'boolean'` - matches `true` or `false`
 * `'bool'` - boolean alias
 * `'string'` - matches a string but not null (use a 0 base quantifier if you want nully values)
