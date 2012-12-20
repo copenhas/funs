@@ -17,17 +17,17 @@ Also the wrapped function should pass the `this` context correctly, so go ahead 
 Each pattern is a type matcher with optionally a quantifier and optionally an alternative pattern.
 
 Here's a few examples:
-* `'object'` - will match an argument that is an object or null
+* `'object'` - will match an argument that is an object
 * `'function*'` - will match a series of arguments that are functions
 * `'number|string'` - will try to match a number and if that fails will try to match a string
   
 Here's what's supported:
 #### Types
-* `'object'` - matches an object or null
+* `'object'` - matches an object but not null (use a 0 base quantifier if you want nully values)
 * `'number'` - matches any number
 * `'boolean'` - matches `true` or `false`
 * `'bool'` - boolean alias
-* `'string'` - matches a string or null
+* `'string'` - matches a string but not null (use a 0 base quantifier if you want nully values)
 * `'date'` - matches any `Date` object
 * `'function'` - matches any function
 * `'array'` - matches any `Array` object
