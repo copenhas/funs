@@ -38,10 +38,36 @@ function typeParser(forType) {
     return parser;
 }
 
+function callbackParser() {
+    var parser = function (position, argsToParse, parsedArgs) {
+        try {
+            return argue.types['function'](position, argsToParse, parsedArgs);
+        }
+        catch (e) {
+            if (e.message.indexOf('argue:') === 0) {
+                throw new Error('argue: was expecting a callback at position ' + position +
+                                ' but got a ' + getType(argsToParse[position]));
+            }
+
+            throw e;
+        }
+    };
+
+    parser.name = 'callback';
+    parser.type = 'callback';
+    return parser;
+}
+
 function quantifierParser(begin, end) {
     var maxNumber = end || Number.MAX_VALUE;
 
+
     return function (parser) {
+        if (maxNumber > 1 && parser.type === 'callback') {
+            throw new Error('argue: callback has special meaning and ' +
+                            'there may only be a max of 1');
+        }
+
         var quantifier = function (position, argsToParse, parsedToArgs) {
             var currentPosition = position,
                 consumedTotal = 0,
@@ -143,10 +169,13 @@ var argue = function (argPattern, func, opts) {
         throw new Error('argue: a function must be provided.');
     }
 
-    var argParsers = [];
+    var argParsers = [],
+        hasCallback = false,
+        callbackIndex = -1;
+
     patterns.forEach(function (pattern) {
         var tokens = pattern.split('|');
-        var parsers = tokens.map(function (token) {
+        var parsers = tokens.map(function (token, index) {
             var lastChar = token.charAt(token.length - 1),
                 type = token,
                 quantifier = null,
@@ -162,6 +191,16 @@ var argue = function (argPattern, func, opts) {
                 throw new Error('argue: invalid arguement pattern, "' + 
                                 type + '" is an unknown type');
             }
+
+            if (parser.type === 'callback' && !hasCallback) {
+                hasCallback = true;
+                callbackIndex = index;
+            } else if (parser.type === 'callback' && hasCallback) {
+                throw new Error('argue: callbacks have special meaning and ' +
+                                'only one callback is allowed in a pattern. One was given as ' +
+                                'this ' + callbackIndex + ' argument pattern');
+            }
+
 
             if (quantifier) {
                 return quantifier(parser);
@@ -202,7 +241,17 @@ var argue = function (argPattern, func, opts) {
                             'were not able to be parsed');
         }
 
-        return func.apply(this, parsedArgs);
+        try{
+            return func.apply(this, parsedArgs);
+        } catch (err) {
+            var callbackSlotArg = parsedArgs[callbackIndex];
+            if (hasCallback && (typeof callbackSlotArg === 'function')) {
+                return callbackSlotArg(err);
+            }
+
+            throw err;
+        }
+
     };
 };
 
@@ -218,6 +267,7 @@ argue.types = {
     'string': typeParser('string'),
     'regexp': typeParser('regexp'),
     'regex': typeParser('regexp'),
+    'callback': callbackParser(),
     'any': typeParser('any')
 };
 

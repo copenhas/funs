@@ -33,6 +33,7 @@ Here's what's supported:
 * `'array'` - matches any `Array` object
 * `'regexp'` - matches any `Regex` object
 * `'regex'` - regexp alias
+* `'callback'` - matches a function but with special meaning. Only one allowed at most and if available will automatically be passed the error your function throws. Argument parser errors will still throw normally just as `path.exists(true, callback);` would in node.
 * `'any'` - matches any type
 
 #### Quantifiers
