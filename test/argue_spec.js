@@ -677,7 +677,7 @@ describe('argue', function () {
             });
 
             it('correctly passes the argument when 1 is given', function () {
-                expect(wrapped('test')).to.equal('test');
+                expect(wrapped('test')).to.eql(['test']);
             });
 
             it('correctly passes the argument when many is given', function () {
@@ -708,11 +708,11 @@ describe('argue', function () {
             });
 
             it('allows the argument to not be given', function () {
-                expect(wrapped()).to.equal(undefined);
+                expect(wrapped()).to.eql([]);
             });
 
             it('correctly passes the argument when 1 is given', function () {
-                expect(wrapped('test')).to.equal('test');
+                expect(wrapped('test')).to.eql(['test']);
             });
 
             it('correctly passes the argument when many is given', function () {
@@ -731,6 +731,85 @@ describe('argue', function () {
                     wrapped('test', 42);
                 }).to.throw(Error);
             });
+        });
+    });
+
+    describe('dummy examples', function () {
+        it('publish msg with optional data', function () {
+            var publish = argue('string', 'any?', function (msg, data) {
+                return {
+                    msg: msg,
+                    data: data
+                };
+            });
+
+            var results = publish('email.valid', false);
+            expect(results).to.eql({
+                msg: 'email.valid',
+                data: false
+            });
+
+            results = publish('document.ready');
+            expect(results).to.eql({
+                msg: 'document.ready',
+                data: undefined
+            });
+        });
+
+        it('async action with optional options', function () {
+            var action = argue('object?', 'function', function (opts, cb) {
+                cb(opts);
+            });
+
+            action(function (opts) {
+                expect(opts).to.equal(undefined);
+            });
+
+            action({ flag: true }, function (opts) {
+                expect(opts).to.eql({ flag: true });
+            });
+        });
+
+        it('sum allowing variable args or an array', function () {
+            //NOTE: putting 'number*' first would never let the 'array' match
+            var sum = argue('array|number*', function (nums) {
+                return nums;
+            });
+
+            expect(sum(1, 2, 3)).to.eql([1, 2, 3]);
+            expect(sum([1, 2, 3, 4])).to.eql([1, 2, 3, 4]);
+        });
+
+        it('router that only needs the first arg', function () {
+            var router = argue('string', 'any*', function (url, etc) {
+                if (url === '/test') {
+                    return etc[0];
+                }
+                else {
+                    return etc;
+                }
+            });
+
+            expect(router('/test')).to.equal(undefined);
+            expect(router('/test', true)).to.equal(true);
+            expect(router('/another', 42, 'something', false))
+                   .to.eql([42, 'something', false]);
+        });
+
+        it('map that takes any but a mapper that does not', function () {
+            //partly to get to 100 tests exactly
+            var map = argue('array', 'function', function (arr, cb) {
+                var results = []
+                for(var i = 0; i < arr.length; i++) {
+                    results.push(cb(arr[i]));
+                }
+            });
+
+            expect(function () {
+                map([2, 'this', 'will', 'blow'], argue('number', function (num) {
+                    return num * num;
+                }));
+            }).to.throw(Error);
         });
     });
 });

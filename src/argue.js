@@ -64,14 +64,15 @@ function quantifierParser(begin, end) {
             }
 
             if (consumedTotal >= begin && consumedTotal <= maxNumber) {
-                if (quantifierParsedArgs.length === 1) {
+                if (maxNumber === 1 && quantifierParsedArgs.length === 1) {
+                    //they only wanted 1 so give it to them
                     parsedToArgs.push(quantifierParsedArgs[0]);
-                } else if (quantifierParsedArgs.length > 1) {
-                    parsedToArgs.push(quantifierParsedArgs);
-                } else if (begin === 0) {
+                } else if (begin === 0 && maxNumber === 1 && quantifierParsedArgs.length === 0) {
+                    //optional arg just wasn't given
                     parsedToArgs.push(undefined);
+                } else {
+                    parsedToArgs.push(quantifierParsedArgs);
                 }
-
                 return consumedTotal;
             }
 
@@ -86,12 +87,10 @@ function quantifierParser(begin, end) {
 }
 
 function alternation(parsers) {
-    var name = "";
+    var name = parsers.map(function (parser) { return parser.name; }).join(' OR ');
 
-    name = parsers.map(function (parser) { return parser.name; }).join(' OR ');
-
-    var parser = function (position, argsToParse, parsedToArgs) {
-        for(var i = 0; i < parser.length; i++) {
+    var alt = function (position, argsToParse, parsedToArgs) {
+        for(var i = 0; i < parsers.length; i++) {
             try {
                 //return on the first one to succeed
                 return parsers[i](position, argsToParse, parsedToArgs);
@@ -106,8 +105,8 @@ function alternation(parsers) {
                         name + ' at position ' + position);
     };
 
-    parser.name = name;
-    return parser;
+    alt.name = name;
+    return alt;
 }
 
 var argue = function () {
