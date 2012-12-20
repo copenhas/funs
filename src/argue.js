@@ -8,30 +8,33 @@ function getType(o) {
                                   .replace(']', '')
                                   .toLowerCase();
 
+    if (typeString === 'number' && Number.isNaN(o)) {
+        return 'nan';
+    }
+
     return typeString;
 }
 
-function typeParser(/*forType, ... */) {
-    var forTypes = argToArray(arguments);
-
+function typeParser(forType) {
     var parser = function (position, argsToParse, parsedArgs) {
         var argType = getType(argsToParse[position]);
 
-        if (forTypes.indexOf(argType) > -1) {
+        if (forType === argType) {
             parsedArgs.push(argsToParse[position]);
             return 1;
         }
 
-        if (forTypes.indexOf('any') > -1) { 
+        if (forType === 'any') { 
             parsedArgs.push(argsToParse[position]);
             return 1;
         }
 
-        throw new Error('argue: was expecting an ' + forTypes.join(', ') + ' at position ' + 
+        throw new Error('argue: was expecting an ' + parser.name + ' at position ' + 
                         position + ' but got an ' + argType);
     };
 
-    parser.name = forTypes.join(', ');
+    parser.name = forType;
+    parser.type = forType;
     return parser;
 }
 
@@ -59,6 +62,20 @@ function quantifierParser(begin, end) {
                         throw e;
                     }
 
+                    // optional parameters accept nully values
+                    if (begin === 0 && consumedTotal === 0) {
+                        var currentArgType = getType(argsToParse[currentPosition]);
+                        if (currentArgType === 'null' || currentArgType === 'nan') {
+                            quantifierParsedArgs.push(null);
+                            currentPosition += 1;
+                            consumedTotal += 1;
+                        } else if (currentArgType === 'undefined') {
+                            quantifierParsedArgs.push(undefined);
+                            currentPosition += 1;
+                            consumedTotal += 1;
+                        }
+                    }
+
                     break;
                 }
             }
@@ -81,6 +98,8 @@ function quantifierParser(begin, end) {
         };
 
         quantifier.quantifier = true;
+        quantifier.min = begin;
+        quantifier.max = maxNumber;
         quantifier.name = begin + " to " + (end || "many") + " of " + parser.name;
         return quantifier;
     };
@@ -109,12 +128,19 @@ function alternation(parsers) {
     return alt;
 }
 
-var argue = function () {
-    var patterns = argToArray(arguments),
-        func = patterns.pop();
+var argue = function (argPattern, func, opts) {
+    opts = opts || {};
+    var patterns = [];
+
+    if (typeof argPattern === 'function') {
+        func = argPattern;
+    }
+    else {
+        patterns = argPattern.split(',').map(function (p) { return p.trim(); });
+    }
 
     if (typeof func !== 'function') {
-        throw new Error('argue: a function must be provided as the last argument');
+        throw new Error('argue: a function must be provided.');
     }
 
     var argParsers = [];
@@ -182,13 +208,16 @@ var argue = function () {
 
 
 argue.types = {
-    'object': typeParser('object', 'null'),
+    'object': typeParser('object'),
     'number': typeParser('number'),
     'array': typeParser('array'),
     'function': typeParser('function'),
     'boolean': typeParser('boolean'),
+    'bool': typeParser('boolean'),
     'date': typeParser('date'),
-    'string': typeParser('string', 'null'),
+    'string': typeParser('string'),
+    'regexp': typeParser('regexp'),
+    'regex': typeParser('regexp'),
     'any': typeParser('any')
 };
 

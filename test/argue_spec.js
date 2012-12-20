@@ -1,14 +1,23 @@
 var argue = require('../src/argue'),
     expect = require('chai').expect;
 
+var supportedTypes = [];
+(function () {
+    for(var attr in argue.types) {
+        if (argue.types.hasOwnProperty(attr)) {
+            supportedTypes.push(attr);
+        }
+    }
+})();
+
 describe('argue', function () {
     it('returns a function', function () {
         var wrapped = argue(function () { });
         expect(wrapped).to.be.a('function');
     });
 
-    it('accepts variable amount of argument patterns', function () {
-        var wrapped = argue('object', 'number', function () {
+    it('accepts argument patterns as a string', function () {
+        var wrapped = argue('object, number', function () {
         });
 
         expect(wrapped).to.be.a('function');
@@ -16,7 +25,7 @@ describe('argue', function () {
 
     it('requires the last argument to be a function', function () {
         expect(function () {
-            argue('object', 'number');
+            argue('object, number');
         }).to.throw(Error);
     });
 
@@ -92,14 +101,23 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
+                }).to.throw(Error);
+            });
+
             it('works when you give it an object', function () {
                 expect(wrapped({ test: 1 })).to.equal(1);
                 expect(wrapped({ test: true })).to.be.ok;
             });
 
-            it('works when you give it a null', function () {
-                expect(wrapped(null)).to.not.be.ok;
-            });
         });
 
         describe('number', function () {
@@ -160,6 +178,18 @@ describe('argue', function () {
             it('throws an error when a string is given', function () {
                 expect(function () {
                     wrapped("test");
+                }).to.throw(Error);
+            });
+
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when given a NaN', function () {
+                expect(function () {
+                    wrapped(Number.NaN);
                 }).to.throw(Error);
             });
 
@@ -234,6 +264,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
+                }).to.throw(Error);
+            });
+
             it('works when you give it an array', function () {
                 expect(wrapped([])).to.equal(0);
                 expect(wrapped([1,2])).to.equal(2);
@@ -300,6 +336,12 @@ describe('argue', function () {
             it('throws an error when a date is given', function () {
                 expect(function () {
                     wrapped(new Date());
+                }).to.throw(Error);
+            });
+
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/)
                 }).to.throw(Error);
             });
 
@@ -370,6 +412,12 @@ describe('argue', function () {
             it('throws an error when a string is given', function () {
                 expect(function () {
                     wrapped("test");
+                }).to.throw(Error);
+            });
+
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
                 }).to.throw(Error);
             });
 
@@ -448,6 +496,12 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
+                }).to.throw(Error);
+            });
+
             it('works when a date is given', function () {
                 var date = new Date();
                 expect(wrapped(date)).to.equal(date);
@@ -517,13 +571,23 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
-            it('works with a string', function () {
-                expect(wrapped('test')).to.equal('test');
+            it('throws an error with a null', function () {
+                expect(function () {
+                    wrapped(null)
+                }).to.throw(Error);
             });
 
-            it('works with a null', function () {
-                expect(wrapped(null)).to.equal(null);
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
+                }).to.throw(Error);
             });
+
+            it('works with a string', function () {
+                expect(wrapped('test')).to.equal('test');
+                expect(wrapped('')).to.equal('');
+            });
+
         });
 
         describe('any', function () {
@@ -573,6 +637,86 @@ describe('argue', function () {
 
             it('works with a null', function () {
                 expect(wrapped(null)).to.equal(null);
+            });
+
+            it('works when given a regex', function () {
+                expect(wrapped(/test/)).to.eql(/test/);
+            });
+        });
+
+        describe('regex', function () {
+            var wrapped = null;
+            
+            beforeEach(function () {
+                wrapped = argue('regex', function (o) { 
+                    return o;
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a number is given', function () {
+                expect(function () {
+                    wrapped(1);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a function is given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it an object', function () {
+                expect(function () {
+                    wrapped({ test: 1 });
+                }).to.throw(Error);
+                
+                expect(function () {
+                    wrapped({ test: true });
+                }).to.throw(Error);
+            });
+
+            it('works when given a regex', function () {
+                expect(wrapped(/test/)).to.eql(/test/);
             });
         });
     });
@@ -642,7 +786,7 @@ describe('argue', function () {
             });
 
             it('optionals can be at the beginning', function () {
-                var middle = argue('object?', 'function', function (opts, callback) {
+                var middle = argue('object?, function', function (opts, callback) {
                     return callback(opts);
                 });
 
@@ -651,13 +795,32 @@ describe('argue', function () {
             });
 
             it('optionals can be in the middle', function () {
-                var middle = argue('string', 'object?', 'function', 
+                var middle = argue('string, object?, function', 
                 function (str, opts, callback) {
                     return callback(opts);
                 });
 
                 expect(middle('test', function (opts) { return opts; })).to.equal(undefined);
                 expect(middle('test', {}, function (opts) { return opts; })).to.eql({});
+            });
+
+            supportedTypes.forEach(function (type) {
+                it('allows nulls for '+type+' when optional', function () {
+                    var nullCheck = argue(type+'?', function (n) { return n; });
+                    expect(nullCheck(null)).to.equal(null);
+                });
+            });
+
+            supportedTypes.forEach(function (type) {
+                it('allows undefined for '+type+' when optional', function () {
+                    var undefinedCheck = argue(type+'?', function (n) { return n; });
+                    expect(undefinedCheck(undefined)).to.equal(undefined);
+                });
+            });
+
+            it('allows NaN for numbers and turns them into nulls', function () {
+                var nanCheck = argue('number?', function (n) { return n; });
+                expect(nanCheck(Number.NaN)).to.equal(null);
             });
         });
 
@@ -696,6 +859,24 @@ describe('argue', function () {
                     wrapped('test', 42);
                 }).to.throw(Error);
             });
+
+            it('does not accept null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('does not accept undefined', function () {
+                expect(function () {
+                    wrapped(undefined);
+                }).to.throw(Error);
+            });
+
+            it('does not accept NaN', function () {
+                expect(function () {
+                    wrapped(Number.NaN);
+                }).to.throw(Error);
+            });
         });
 
         describe('*', function () {
@@ -731,12 +912,31 @@ describe('argue', function () {
                     wrapped('test', 42);
                 }).to.throw(Error);
             });
+
+            supportedTypes.forEach(function (type) {
+                it('allows nulls for '+type+' when optional', function () {
+                    var nullCheck = argue(type+'?', function (n) { return n; });
+                    expect(nullCheck(null)).to.equal(null);
+                });
+            });
+
+            supportedTypes.forEach(function (type) {
+                it('allows undefined for '+type+' when optional', function () {
+                    var undefinedCheck = argue(type+'?', function (n) { return n; });
+                    expect(undefinedCheck(undefined)).to.equal(undefined);
+                });
+            });
+
+            it('allows NaN for numbers and turns them into nulls', function () {
+                var nanCheck = argue('number?', function (n) { return n; });
+                expect(nanCheck(Number.NaN)).to.equal(null);
+            });
         });
     });
 
     describe('dummy examples', function () {
         it('publish msg with optional data', function () {
-            var publish = argue('string', 'any?', function (msg, data) {
+            var publish = argue('string, any?', function (msg, data) {
                 return {
                     msg: msg,
                     data: data
@@ -757,7 +957,7 @@ describe('argue', function () {
         });
 
         it('async action with optional options', function () {
-            var action = argue('object?', 'function', function (opts, cb) {
+            var action = argue('object?, function', function (opts, cb) {
                 cb(opts);
             });
 
@@ -781,7 +981,7 @@ describe('argue', function () {
         });
 
         it('router that only needs the first arg', function () {
-            var router = argue('string', 'any*', function (url, etc) {
+            var router = argue('string, any*', function (url, etc) {
                 if (url === '/test') {
                     return etc[0];
                 }
@@ -798,7 +998,7 @@ describe('argue', function () {
 
         it('map that takes any but a mapper that does not', function () {
             //partly to get to 100 tests exactly
-            var map = argue('array', 'function', function (arr, cb) {
+            var map = argue('array, function', function (arr, cb) {
                 var results = []
                 for(var i = 0; i < arr.length; i++) {
                     results.push(cb(arr[i]));
