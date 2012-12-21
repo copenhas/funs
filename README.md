@@ -46,8 +46,8 @@ Modifiers come at the beginning of a type pattern and take effect before quantif
 Quantifiers always go at the end of a type (sorry no grouping or optional alternations supported)
 
 * `'?'` - matches 0 to 1, effectively an optional argument. The argument will be passed into your function as an `undefined` or the actual value. Matches nully values (null, undefined, and NaN). NaN value will be turned into a null. Optional arguments do not have to be last so long as all patterns can successfully match. For example, `argue('number', 'object?', 'function', func);` would work while `argue('number', 'function?', 'function', func);` would not.
-* `'*'` - matches 0 to many, argument will be passed into your function as an array
-* `'+'` - matches 1 to many, argument will be passed into your function as an array. Matches nully values (null, undefined, and NaN). NaN value will be turned into a null. 
+* `'*'` - matches 0 to many, argument will be passed into your function as an array. Matches nully values (null, undefined, and NaN). NaN value will be turned into a null. 
+* `'+'` - matches 1 to many, argument will be passed into your function as an array. 
 
 #### Alternation
 Alternations attempt to match left to right and take the first one to succeed. Be **careful** on your ordering!
