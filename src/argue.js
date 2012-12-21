@@ -14,6 +14,9 @@
     }
 
     function argToArray(args) {
+        if (getType(args) !== 'arguments') {
+            throw new Error('argue: argue.toArray() only accepts Arguments objects');
+        }
         return Array.prototype.slice.call(args);
     }
 
@@ -76,7 +79,6 @@
     function quantifierParser(begin, end) {
         var maxNumber = end || Number.MAX_VALUE;
 
-
         return function (parser) {
             if (maxNumber > 1 && parser.type === 'callback') {
                 throw new Error('argue: callback has special meaning and ' +
@@ -125,7 +127,8 @@
                     if (maxNumber === 1 && quantifierParsedArgs.length === 1) {
                         //they only wanted 1 so give it to them
                         parsedToArgs.push(quantifierParsedArgs[0]);
-                    } else if (begin === 0 && maxNumber === 1 && quantifierParsedArgs.length === 0) {
+                    } else if (begin === 0 && maxNumber === 1 && 
+                               quantifierParsedArgs.length === 0) {
                         //optional arg just wasn't given
                         parsedToArgs.push(undefined);
                     } else {
@@ -228,7 +231,8 @@
     }
 
     var defaultOpts = {
-        partial: false
+        partial: false,
+        bind: false
     };
 
     var argue = function (argPattern, func, opts) {
@@ -285,8 +289,8 @@
                     callbackIndex = index;
                 } else if (parser.type === 'callback' && hasCallback) {
                     throw new Error('argue: callbacks have special meaning and ' +
-                                    'only one callback is allowed in a pattern. One was given as ' +
-                                    'this ' + callbackIndex + ' argument pattern');
+                                    'only one callback is allowed in a pattern. One was ' +
+                                    'given as this ' + callbackIndex + ' argument pattern');
                 }
 
 
@@ -328,6 +332,9 @@
         '+': quantifierParser(1),
         '*': quantifierParser(0)
     };
+
+    argue.toArray = argToArray;
+    argue.getType = getType;
 
     if (typeof module !== 'undefined' && typeof exports !== 'undefined') {
         //commonjs
