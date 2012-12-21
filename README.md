@@ -14,7 +14,7 @@ You'll probably want the same number of argument patterns as you do arguments to
 Also the wrapped function should pass the `this` context correctly, so go ahead and use it to build methods if you like.
   
 ### Argument Patterns
-Each pattern is a type matcher with optionally a quantifier and optionally an alternative pattern.
+Each pattern is a type matcher with optionally a quantifier and optionally an alternative pattern. For examples check out the `dummy examples` section of the `argue_spec`.
 
 Here's a few examples:
 * `'object'` - will match an argument that is an object
@@ -48,3 +48,10 @@ Alternations attempt to match left to right and take the first one to succeed. B
 `'number*|array'` would never give the `'array'` pattern a chance to match!
 
 `'<pattern>|<pattern>[|<pattern>...]'`
+
+
+### Options
+For examples I suggest checking out the options section of the `argue_spec`.
+
+* `'partial'` - `true` or `false` flag that enables the ability to incrementally apply arguments through partial application (or currying). When enabled, if not enough arguements have been given a new function will be returns that accepts the remaining arguments.
+* `'bind'` - `true` or `false` but requires `'partial'` to be enabled. The first time the function is partially applied it will bind itself that that context. 

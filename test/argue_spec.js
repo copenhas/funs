@@ -23,10 +23,18 @@ describe('argue', function () {
         expect(wrapped).to.be.a('function');
     });
 
-    it('requires the last argument to be a function', function () {
+    it('requires a function to be given', function () {
         expect(function () {
             argue('object, number');
         }).to.throw(Error);
+
+        expect(function () {
+            argue(function () { }, 'object, number');
+        }).to.throw(Error);
+
+        expect(function () {
+            argue('object, number', function () {});
+        }).to.not.throw();
     });
 
     it('throws an error if the argument pattern is not supported', function () {
@@ -40,6 +48,25 @@ describe('argue', function () {
         expect(function () {
             wrapped(1);
         }).to.throw(Error);
+    });
+
+    it('maintains this context', function () {
+        var obj = {
+            counter: 0,
+            attr: false,
+            prop: argue('bool?', function (val) {
+                this.counter++;
+                if (typeof val === 'boolean') {
+                    this.attr = val;
+                }
+
+                return this.attr;
+            })
+        };
+
+        expect(obj.prop()).to.equal(false);
+        expect(obj.prop(true)).to.equal(true);
+        expect(obj.counter).to.equal(2);
     });
 
     describe('types', function () {
@@ -1055,6 +1082,135 @@ describe('argue', function () {
             it('allows NaN for numbers and turns them into nulls', function () {
                 var nanCheck = argue('number*', function (n) { return n; });
                 expect(nanCheck(Number.NaN)).to.eql([null]);
+            });
+        });
+    });
+
+    describe('options', function () {
+        describe('partial', function () {
+            it('has a default value of false', function () {
+                var wrappedDef = argue('string', function (str) { return str; });
+                var wrappedGiv = argue('string', function (str) { return str; }, 
+                                       { partial: false });
+
+                expect(wrappedDef('test')).to.equal(wrappedGiv('test'));
+
+                expect(function () {
+                    wrappedDef();
+                }).to.throw(Error);;
+
+                expect(function () {
+                    wrappedGiv();
+                }).to.throw(Error);;
+
+                expect(function () {
+                    wrappedDef('test', 'another');
+                }).to.throw(Error);;
+
+                expect(function () {
+                    wrappedGiv('test', 'another');
+                }).to.throw(Error);;
+            });
+
+            it('performs partial application when set to true', function () {
+                var map = argue('function, array', function (func, arr) {
+                    return arr.map(func);
+                }, { partial: true });
+
+                var doubler = map(function (num) { return num * 2; });
+
+                expect(doubler([1,2,3])).to.eql([2,4,6]);
+            });
+
+            it('can continually do partial application', function () {
+                var fiver = argue('number, number, number, number, number',
+                                 function (one, two, three, four, five) {
+                                     return one + two + three + four + five;
+                                 }, { partial: true });
+
+                var partial = fiver;
+                for(var i = 0; i < 4; i++) {
+                    partial = partial(i);
+                }
+
+                expect(partial(4)).to.equal(10);
+            });
+
+            it('does not maintains this while doing parital application', function () {
+                var obj = {
+                    multipler: 3,
+                    formula: argue('number, number', function (first, second) {
+                        return (first - second) * this.multipler;
+                    }, { partial: true })
+                };
+
+                var firstGiven = {
+                   multipler: 1,
+                   formula: obj.formula(2)
+                };
+
+                expect(firstGiven.formula(1)).to.equal(1);
+            });
+        });
+
+        describe('bind', function () {
+            it ('requires the partial option to be true', function () {
+                expect(function () {
+                    argue('number, number', function () { }, { bind: true });
+                }).to.throw(Error);
+
+                expect(function () {
+                    argue('number, number', function () { }, { partial: true, bind: true });
+                }).to.not.throw();
+            });
+
+            it('has a default value of false', function () {
+                var objDefault = {
+                   attr: 2,
+                   foo: argue('number, number', function (one, two) { 
+                    return one + two + this.attr;
+                   }, { partial: true })
+                };
+
+                var objGiven = {
+                   attr: 1,
+                   foo: argue('number, number', function (one, two) { 
+                    return one + two + this.attr;
+                   }, { partial: true, bind: false })
+                };
+
+                var anotherObj = {
+                    attr: 3
+                };
+
+                // with bind off the partially applied function has whatever context
+                // you assign it to
+                anotherObj.foo = objDefault.foo(1);
+                var defaultValue = anotherObj.foo(2);
+
+                // even though the original objects had different attr values
+                // it's the final context that matters
+                anotherObj.foo = objGiven.foo(1);
+                var givenValue = anotherObj.foo(2);
+
+                expect(defaultValue).to.equal(givenValue);
+            });
+
+            it('binds this to the first this context',
+            function () {
+                var obj = {
+                    multipler: 2,
+                    formula: argue('number, number', function (one, two) {
+                        return (one + two) * this.multipler;
+                    }, { partial: true, bind: true })
+                };
+
+                var another = {
+                    multipler: 10,
+                    formula: obj.formula(1)
+                };
+
+                expect(another.formula(1)).to.equal(obj.formula(1, 1));
             });
         });
     });
