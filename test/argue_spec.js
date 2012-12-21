@@ -887,6 +887,60 @@ describe('argue', function () {
         });
     });
 
+    describe('modifiers', function () {
+        describe('^', function () {
+            var wrapped = null;
+
+            beforeEach(function () {
+                wrapped = argue('^function', function (o) {
+                    return o;
+                });
+            });
+
+            it('accepts anything besides the type given', function () {
+                expect(wrapped({})).to.eql({});
+                expect(wrapped(1)).to.equal(1);
+                expect(wrapped('test')).to.equal('test');
+                expect(wrapped(true)).to.equal(true);
+            });
+
+            it('does not match nully values', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+                expect(function () {
+                    wrapped(undefined);
+                }).to.throw(Error);
+                expect(function () {
+                    wrapped(Number.NaN);
+                }).to.throw(Error);
+            });
+
+            it('throws an error if the argument is the type given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('can be made optional', function () {
+                var optional = argue('^function?', function (o) {
+                    return o;
+                });
+
+                expect(optional()).to.equal(undefined);
+                expect(optional(null)).to.equal(null);
+            });
+
+            it('works with quantifiers', function () {
+                var many = argue('^function+', function (o) {
+                    return o;
+                });
+
+                expect(many('test', 'another')).to.eql(['test', 'another']);
+            });
+        });
+    });
+
     describe('quantifiers', function () {
         describe('?', function () {
             var wrapped = null;

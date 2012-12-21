@@ -30,6 +30,10 @@
             return 'nan';
         }
 
+        if (typeString.indexOf('html') === 0) {
+            return 'dom';
+        }
+
         return typeString;
     }
 
@@ -74,6 +78,32 @@
         parser.desc = 'callback';
         parser.type = 'callback';
         return parser;
+    }
+
+    function besidesParser() {
+        return function (parser) {
+            var modifier = function (position, argsToParse, parsedToArgs) {
+                var parserMatchedArgs = [];
+                try {
+                    parser(position, argsToParse, parserMatchedArgs);
+                } catch (e) {
+                    if (e.message.indexOf('argue:') !== 0) {
+                        throw e;
+                    }
+
+                    var argType = getType(argsToParse[position]);
+                    if (['null', 'undefined', 'nan'].indexOf(argType) === -1 ){
+                        parsedToArgs.push(argsToParse[position]);
+                        return 1;
+                    }
+                }
+
+                throw new Error('argue: expected ' + modifier.desc + ' at position ' + position);
+            };
+
+            modifier.desc = 'anything besides ' + parser.desc;
+            return modifier;
+        };
     }
 
     function quantifierParser(begin, end) {
@@ -142,8 +172,6 @@
             };
 
             quantifier.quantifier = true;
-            quantifier.min = begin;
-            quantifier.max = maxNumber;
             quantifier.desc = begin + " to " + (end || "many") + " of " + parser.desc;
             return quantifier;
         };
@@ -268,13 +296,20 @@
         patterns.forEach(function (pattern, index) {
             var tokens = pattern.split('|');
             var parsers = tokens.map(function (token) {
-                var lastChar = token.charAt(token.length - 1),
+                var firstChar = token.charAt(0),
+                    lastChar = token.charAt(token.length - 1),
                     type = token,
                     quantifier = null,
+                    modifier = null,
                     parser = null;
 
+                if (argue.modifiers[firstChar]) {
+                    type = type.substr(1, type.length);
+                    modifier = argue.modifiers[firstChar];
+                }
+
                 if (argue.quantifiers[lastChar]) {
-                    type = token.substr(0, token.length - 1);
+                    type = type.substr(0, type.length - 1);
                     quantifier = argue.quantifiers[lastChar];
                 }
 
@@ -293,6 +328,9 @@
                                     'given as this ' + callbackIndex + ' argument pattern');
                 }
 
+                if (modifier) {
+                    parser = modifier(parser);
+                }
 
                 if (quantifier) {
                     return quantifier(parser);
@@ -324,7 +362,12 @@
         'regexp': typeParser('regexp'),
         'regex': typeParser('regexp'),
         'callback': callbackParser(),
+        'dom': typeParser('dom'),
         'any': typeParser('any')
+    };
+
+    argue.modifiers = {
+        '^': besidesParser()
     };
 
     argue.quantifiers = {

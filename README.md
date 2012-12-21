@@ -34,7 +34,13 @@ Here's what's supported:
 * `'regexp'` - matches any `Regex` object
 * `'regex'` - regexp alias
 * `'callback'` - matches a function but with special meaning. Only one allowed at most and if available will automatically be passed the error your function throws. Argument parser errors will still throw normally just as `path.exists(true, callback);` would in node.
+* `'dom'` - should match any of the native DOM objects such as `HTMLDivElement` or `HTMLInputElement` (I think)
 * `'any'` - matches any type
+
+#### Modifiers
+Modifiers come at the beginning of a type pattern and take effect before quantifiers (`'^function?'` would be anything but a `'function'` and it's optional). Meaning they can still be made optional and accept many arguments.
+
+* `'^'` - matches anything but the type specified.
 
 #### Quantifiers
 Quantifiers always go at the end of a type (sorry no grouping or optional alternations supported)
