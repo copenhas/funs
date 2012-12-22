@@ -3,6 +3,8 @@ A friendly somewhat familiar argument parser to make great APIs easier
 
 Sort of like a simpler regular expression matching for arguments and types instead of characters.
 
+[![Build Status](https://travis-ci.org/copenhas/argue.png)](https://travis-ci.org/copenhas/argue)
+
 ## Install
 Currently not in the NPM register. You want to play around be my guest. 
 Clone the repo and do a `make init` in the project directory.
