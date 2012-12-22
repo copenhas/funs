@@ -9,6 +9,11 @@ Clone the repo and do a `make init` in the project directory.
 After that use the `npm link` to link it into a project to test it out.
 
 ## Usage
+It supports CommonJs, AMD, and plain global module patterns, so get ahold of the `argue` function one of those ways. Note, that it picks the first one it detects to expose itself (CommonJs, AMD, or global).
+
+Assuming CommonJs the usage is this:
+
+    var argue = require('argue');
     var newWrappedFunction = argue(['<arg pattern>, ...',] <your function> [, opts]);
 You'll probably want the same number of argument patterns as you do arguments to your function.
 Also the wrapped function should pass the `this` context correctly, so go ahead and use it to build methods if you like.
