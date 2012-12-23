@@ -1,7 +1,7 @@
 # funs
-A friendly somewhat familiar argument parser to make great APIs easier
+A friendly somewhat familiar argument parser to make great APIs easier.
 
-Sort of like a simpler regular expression matching for arguments and types instead of characters.
+It handles function argument specs/patterns and sanitizes them a little. Sort of like a simpler regular expression matching for arguments and types instead of strings and characters. Which means less argument parsing for you just because you want an optional argument or require something to be a function.
 
 [![Build Status](https://travis-ci.org/copenhas/funs.png)](https://travis-ci.org/copenhas/funs)
 
