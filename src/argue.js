@@ -30,6 +30,10 @@
             return 'nan';
         }
 
+        if (o instanceof Error) {
+            return 'error';
+        }
+
         if (typeString.indexOf('html') === 0) {
             return 'dom';
         }
@@ -363,6 +367,7 @@
         'regex': typeParser('regexp'),
         'callback': callbackParser(),
         'dom': typeParser('dom'),
+        'error': typeParser('error'),
         'any': typeParser('any')
     };
 

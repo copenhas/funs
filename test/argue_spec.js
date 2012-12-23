@@ -1,6 +1,16 @@
 var argue = require('../src/argue'),
     expect = require('chai').expect;
 
+var errorConstructors = [
+    Error, 
+    TypeError,
+    ReferenceError,
+    EvalError,
+    RangeError,
+    SyntaxError,
+    URIError
+];
+
 var supportedTypes = [];
 (function () {
     for(var attr in argue.types) {
@@ -140,6 +150,14 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
+            });
+
             it('works when you give it an object', function () {
                 expect(wrapped({ test: 1 })).to.equal(1);
                 expect(wrapped({ test: true })).to.be.ok;
@@ -220,6 +238,14 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
+            });
+
             it('works when you give it a number', function () {
                 expect(wrapped(12)).to.equal(12);
                 expect(wrapped(32.8)).to.equal(32.8);
@@ -297,6 +323,14 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
+            });
+
             it('works when you give it an array', function () {
                 expect(wrapped([])).to.equal(0);
                 expect(wrapped([1,2])).to.equal(2);
@@ -370,6 +404,14 @@ describe('argue', function () {
                 expect(function () {
                     wrapped(/test/)
                 }).to.throw(Error);
+            });
+
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
             });
 
             it('works when a function is given', function () {
@@ -446,6 +488,14 @@ describe('argue', function () {
                 expect(function () {
                     wrapped(/test/);
                 }).to.throw(Error);
+            });
+
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
             });
 
             it('works when a boolean is given', function () {
@@ -529,6 +579,14 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
+            });
+
             it('works when a date is given', function () {
                 var date = new Date();
                 expect(wrapped(date)).to.equal(date);
@@ -610,6 +668,14 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
+            });
+
             it('works with a string', function () {
                 expect(wrapped('test')).to.equal('test');
                 expect(wrapped('')).to.equal('');
@@ -668,6 +734,12 @@ describe('argue', function () {
 
             it('works when given a regex', function () {
                 expect(wrapped(/test/)).to.eql(/test/);
+            });
+
+            it('works when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(wrapped(new err())).is.a('Error');
+                });
             });
         });
 
@@ -740,6 +812,14 @@ describe('argue', function () {
                 expect(function () {
                     wrapped({ test: true });
                 }).to.throw(Error);
+            });
+
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
             });
 
             it('works when given a regex', function () {
@@ -818,6 +898,14 @@ describe('argue', function () {
                 }).to.throw(Error);
             });
 
+            it('throws an when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(function () {
+                        wrapped(new err())
+                    }).to.throw(Error);
+                });
+            });
+
             it('works when a function is given', function () {
                 expect(function () {
                     wrapped(function () { });
@@ -849,6 +937,90 @@ describe('argue', function () {
                     expect(err).to.be.a('error');
                     expect(err.message).to.equal('test message');
                 }, { });
+            });
+        });
+        
+        describe('error', function () {
+            var wrapped = null;
+            
+            beforeEach(function () {
+                wrapped = argue('error', function (o) { 
+                    return o;
+                });
+            });
+
+            it('throws an error when no arguments are given', function () {
+                expect(function () {
+                    wrapped();
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a number is given', function () {
+                expect(function () {
+                    wrapped(1);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a function is given', function () {
+                expect(function () {
+                    wrapped(function () { });
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it an array', function () {
+                expect(function () {
+                    wrapped([]);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a boolean is given', function () {
+                expect(function () {
+                    wrapped(true);
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped(false);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a date is given', function () {
+                expect(function () {
+                    wrapped(new Date());
+                }).to.throw(Error);
+            });
+
+            it('throws an error when a string is given', function () {
+                expect(function () {
+                    wrapped("test");
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it a null', function () {
+                expect(function () {
+                    wrapped(null);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when given a regex', function () {
+                expect(function () {
+                    wrapped(/test/);
+                }).to.throw(Error);
+            });
+
+            it('throws an error when you give it an object', function () {
+                expect(function () {
+                    wrapped({ test: 1 });
+                }).to.throw(Error);
+
+                expect(function () {
+                    wrapped({ test: true });
+                }).to.throw(Error);
+            });
+
+            it('works when given an Error object', function () {
+                errorConstructors.forEach(function (err) {
+                    expect(wrapped(new err())).is.a('Error');
+                });
             });
         });
     });
