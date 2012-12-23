@@ -6,9 +6,9 @@ It handles function argument specs/patterns and sanitizes them a little. Sort of
 [![Build Status](https://travis-ci.org/copenhas/funs.png)](https://travis-ci.org/copenhas/funs)
 
 ## Install
-Currently not in the NPM register. You want to play around be my guest. 
-Clone the repo and do a `make init` in the project directory.
-After that use the `npm link` to link it into a project to test it out.
+`npm install funs`
+
+You want to play around be my guest. Clone the repo and do a `npm install` in the project directory.
 
 ## Usage
 It supports CommonJs, AMD, and plain global module patterns, so get ahold of the `funs` function one of those ways. Note, that it picks the first one it detects to expose itself (CommonJs, AMD, or global).
