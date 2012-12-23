@@ -1,4 +1,4 @@
-var argue = require('../src/argue'),
+var funs = require('../src/funs'),
     expect = require('chai').expect;
 
 var errorConstructors = [
@@ -13,21 +13,21 @@ var errorConstructors = [
 
 var supportedTypes = [];
 (function () {
-    for(var attr in argue.types) {
-        if (argue.types.hasOwnProperty(attr)) {
+    for(var attr in funs.types) {
+        if (funs.types.hasOwnProperty(attr)) {
             supportedTypes.push(attr);
         }
     }
 })();
 
-describe('argue', function () {
+describe('funs', function () {
     it('returns a function', function () {
-        var wrapped = argue(function () { });
+        var wrapped = funs(function () { });
         expect(wrapped).to.be.a('function');
     });
 
     it('accepts argument patterns as a string', function () {
-        var wrapped = argue('object, number', function () {
+        var wrapped = funs('object, number', function () {
         });
 
         expect(wrapped).to.be.a('function');
@@ -35,26 +35,26 @@ describe('argue', function () {
 
     it('requires a function to be given', function () {
         expect(function () {
-            argue('object, number');
+            funs('object, number');
         }).to.throw(Error);
 
         expect(function () {
-            argue(function () { }, 'object, number');
+            funs(function () { }, 'object, number');
         }).to.throw(Error);
 
         expect(function () {
-            argue('object, number', function () {});
+            funs('object, number', function () {});
         }).to.not.throw();
     });
 
     it('throws an error if the argument pattern is not supported', function () {
         expect(function () {
-            argue('randomCrap$@%', function () { });
+            funs('randomCrap$@%', function () { });
         }).to.throw(Error);
     });
 
     it('throws an error if told to expect no args and is passed some', function () {
-        var wrapped = argue(function () { });
+        var wrapped = funs(function () { });
         expect(function () {
             wrapped(1);
         }).to.throw(Error);
@@ -64,7 +64,7 @@ describe('argue', function () {
         var obj = {
             counter: 0,
             attr: false,
-            prop: argue('bool?', function (val) {
+            prop: funs('bool?', function (val) {
                 this.counter++;
                 if (typeof val === 'boolean') {
                     this.attr = val;
@@ -84,7 +84,7 @@ describe('argue', function () {
             var wrapped = null;
             
             beforeEach(function () {
-                wrapped = argue('object', function (o) { 
+                wrapped = funs('object', function (o) { 
                     if (o === null) {
                         return false;
                     }
@@ -169,7 +169,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('number', function (n) { 
+                wrapped = funs('number', function (n) { 
                     return n;
                 });
             });
@@ -256,7 +256,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('array', function (arr) { 
+                wrapped = funs('array', function (arr) { 
                     return arr.length;
                 });
             });
@@ -341,7 +341,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('function', function (func) { 
+                wrapped = funs('function', function (func) { 
                     return func();
                 });
             });
@@ -423,7 +423,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('boolean', function (bl) { 
+                wrapped = funs('boolean', function (bl) { 
                     return bl;
                 });
             });
@@ -508,7 +508,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('date', function (d) { 
+                wrapped = funs('date', function (d) { 
                     return d;
                 });
             });
@@ -597,7 +597,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('string', function (d) { 
+                wrapped = funs('string', function (d) { 
                     return d;
                 });
             });
@@ -687,7 +687,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('any', function (d) { 
+                wrapped = funs('any', function (d) { 
                     if (typeof d === 'function') {
                         return d();
                     }
@@ -747,7 +747,7 @@ describe('argue', function () {
             var wrapped = null;
             
             beforeEach(function () {
-                wrapped = argue('regex', function (o) { 
+                wrapped = funs('regex', function (o) { 
                     return o;
                 });
             });
@@ -831,7 +831,7 @@ describe('argue', function () {
             var wrapped = null;
             
             beforeEach(function () {
-                wrapped = argue('callback', function (o) { 
+                wrapped = funs('callback', function (o) { 
                     return o;
                 });
             });
@@ -913,7 +913,7 @@ describe('argue', function () {
             });
 
             it('callbacks recieve any error the original function throws', function () {
-                var errTest = argue('callback', function (callback) {
+                var errTest = funs('callback', function (callback) {
                     throw new Error('test message');
                 });
 
@@ -924,7 +924,7 @@ describe('argue', function () {
             });
 
             it('callbacks do not have to come last', function () {
-                var errTest = argue('callback, object?', function (callback, opts) {
+                var errTest = funs('callback, object?', function (callback, opts) {
                     throw new Error('test message');
                 });
 
@@ -944,7 +944,7 @@ describe('argue', function () {
             var wrapped = null;
             
             beforeEach(function () {
-                wrapped = argue('error', function (o) { 
+                wrapped = funs('error', function (o) { 
                     return o;
                 });
             });
@@ -1029,14 +1029,14 @@ describe('argue', function () {
         var wrapped = null;
 
         beforeEach(function () {
-            wrapped = argue('object|number|function', function (n) {
+            wrapped = funs('object|number|function', function (n) {
                 return typeof n;
             });
         });
 
         it('throws an error if one of the alternatives is an unknown pattern', function () {
             expect(function () {
-                argue('object|randomCrap$@%|number', function () { } );
+                funs('object|randomCrap$@%|number', function () { } );
             }).to.throw(Error);
         });
 
@@ -1064,7 +1064,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('^function', function (o) {
+                wrapped = funs('^function', function (o) {
                     return o;
                 });
             });
@@ -1095,7 +1095,7 @@ describe('argue', function () {
             });
 
             it('can be made optional', function () {
-                var optional = argue('^function?', function (o) {
+                var optional = funs('^function?', function (o) {
                     return o;
                 });
 
@@ -1104,7 +1104,7 @@ describe('argue', function () {
             });
 
             it('works with quantifiers', function () {
-                var many = argue('^function+', function (o) {
+                var many = funs('^function+', function (o) {
                     return o;
                 });
 
@@ -1118,7 +1118,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('string?', function (str) {
+                wrapped = funs('string?', function (str) {
                     return str;
                 });
             });
@@ -1144,7 +1144,7 @@ describe('argue', function () {
             });
 
             it('optionals can be at the beginning', function () {
-                var middle = argue('object?, function', function (opts, callback) {
+                var middle = funs('object?, function', function (opts, callback) {
                     return callback(opts);
                 });
 
@@ -1153,7 +1153,7 @@ describe('argue', function () {
             });
 
             it('optionals can be in the middle', function () {
-                var middle = argue('string, object?, function', 
+                var middle = funs('string, object?, function', 
                 function (str, opts, callback) {
                     return callback(opts);
                 });
@@ -1164,20 +1164,20 @@ describe('argue', function () {
 
             supportedTypes.forEach(function (type) {
                 it('allows nulls for '+type+' when optional', function () {
-                    var nullCheck = argue(type+'?', function (n) { return n; });
+                    var nullCheck = funs(type+'?', function (n) { return n; });
                     expect(nullCheck(null)).to.equal(null);
                 });
             });
 
             supportedTypes.forEach(function (type) {
                 it('allows undefined for '+type+' when optional', function () {
-                    var undefinedCheck = argue(type+'?', function (n) { return n; });
+                    var undefinedCheck = funs(type+'?', function (n) { return n; });
                     expect(undefinedCheck(undefined)).to.equal(undefined);
                 });
             });
 
             it('allows NaN for numbers and turns them into nulls', function () {
-                var nanCheck = argue('number?', function (n) { return n; });
+                var nanCheck = funs('number?', function (n) { return n; });
                 expect(nanCheck(Number.NaN)).to.equal(null);
             });
         });
@@ -1186,7 +1186,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('string+', function (str) {
+                wrapped = funs('string+', function (str) {
                     return str;
                 });
             });
@@ -1220,7 +1220,7 @@ describe('argue', function () {
 
             it('does not work with callbacks', function () {
                 expect(function () {
-                    argue('callback+', function () { });
+                    funs('callback+', function () { });
                 }).to.throw(Error);
             });
 
@@ -1247,7 +1247,7 @@ describe('argue', function () {
             var wrapped = null;
 
             beforeEach(function () {
-                wrapped = argue('string*', function (str) {
+                wrapped = funs('string*', function (str) {
                     return str;
                 });
             });
@@ -1279,7 +1279,7 @@ describe('argue', function () {
 
             it('does not work with callbacks', function () {
                 expect(function () {
-                    argue('callback*', function () { });
+                    funs('callback*', function () { });
                 }).to.throw(Error);
             });
 
@@ -1288,7 +1288,7 @@ describe('argue', function () {
                     return;
                 } else {
                     it('allows nulls for '+type+' when optional', function () {
-                        var nullCheck = argue(type+'*', function (n) { return n; });
+                        var nullCheck = funs(type+'*', function (n) { return n; });
                         expect(nullCheck(null)).to.eql([null]);
                     });
                 }
@@ -1299,14 +1299,14 @@ describe('argue', function () {
                     return;
                 } else {
                     it('allows undefined for '+type+' when optional', function () {
-                        var undefinedCheck = argue(type+'*', function (n) { return n; });
+                        var undefinedCheck = funs(type+'*', function (n) { return n; });
                         expect(undefinedCheck(undefined)).to.eql([undefined]);
                     });
                 }
             });
 
             it('allows NaN for numbers and turns them into nulls', function () {
-                var nanCheck = argue('number*', function (n) { return n; });
+                var nanCheck = funs('number*', function (n) { return n; });
                 expect(nanCheck(Number.NaN)).to.eql([null]);
             });
         });
@@ -1315,8 +1315,8 @@ describe('argue', function () {
     describe('options', function () {
         describe('partial', function () {
             it('has a default value of false', function () {
-                var wrappedDef = argue('string', function (str) { return str; });
-                var wrappedGiv = argue('string', function (str) { return str; }, 
+                var wrappedDef = funs('string', function (str) { return str; });
+                var wrappedGiv = funs('string', function (str) { return str; }, 
                                        { partial: false });
 
                 expect(wrappedDef('test')).to.equal(wrappedGiv('test'));
@@ -1339,7 +1339,7 @@ describe('argue', function () {
             });
 
             it('performs partial application when set to true', function () {
-                var map = argue('function, array', function (func, arr) {
+                var map = funs('function, array', function (func, arr) {
                     return arr.map(func);
                 }, { partial: true });
 
@@ -1349,7 +1349,7 @@ describe('argue', function () {
             });
 
             it('can continually do partial application', function () {
-                var fiver = argue('number, number, number, number, number',
+                var fiver = funs('number, number, number, number, number',
                                  function (one, two, three, four, five) {
                                      return one + two + three + four + five;
                                  }, { partial: true });
@@ -1365,7 +1365,7 @@ describe('argue', function () {
             it('does not maintains this while doing parital application', function () {
                 var obj = {
                     multipler: 3,
-                    formula: argue('number, number', function (first, second) {
+                    formula: funs('number, number', function (first, second) {
                         return (first - second) * this.multipler;
                     }, { partial: true })
                 };
@@ -1382,25 +1382,25 @@ describe('argue', function () {
         describe('bind', function () {
             it ('requires the partial option to be true', function () {
                 expect(function () {
-                    argue('number, number', function () { }, { bind: true });
+                    funs('number, number', function () { }, { bind: true });
                 }).to.throw(Error);
 
                 expect(function () {
-                    argue('number, number', function () { }, { partial: true, bind: true });
+                    funs('number, number', function () { }, { partial: true, bind: true });
                 }).to.not.throw();
             });
 
             it('has a default value of false', function () {
                 var objDefault = {
                    attr: 2,
-                   foo: argue('number, number', function (one, two) { 
+                   foo: funs('number, number', function (one, two) { 
                     return one + two + this.attr;
                    }, { partial: true })
                 };
 
                 var objGiven = {
                    attr: 1,
-                   foo: argue('number, number', function (one, two) { 
+                   foo: funs('number, number', function (one, two) { 
                     return one + two + this.attr;
                    }, { partial: true, bind: false })
                 };
@@ -1426,7 +1426,7 @@ describe('argue', function () {
             function () {
                 var obj = {
                     multipler: 2,
-                    formula: argue('number, number', function (one, two) {
+                    formula: funs('number, number', function (one, two) {
                         return (one + two) * this.multipler;
                     }, { partial: true, bind: true })
                 };
@@ -1443,7 +1443,7 @@ describe('argue', function () {
 
     describe('dummy examples', function () {
         it('publish msg with optional data', function () {
-            var publish = argue('string, any?', function (msg, data) {
+            var publish = funs('string, any?', function (msg, data) {
                 return {
                     msg: msg,
                     data: data
@@ -1464,7 +1464,7 @@ describe('argue', function () {
         });
 
         it('async action with optional options', function () {
-            var action = argue('object?, function', function (opts, cb) {
+            var action = funs('object?, function', function (opts, cb) {
                 cb(opts);
             });
 
@@ -1479,7 +1479,7 @@ describe('argue', function () {
 
         it('sum allowing variable args or an array', function () {
             //NOTE: putting 'number*' first would never let the 'array' match
-            var sum = argue('array|number*', function (nums) {
+            var sum = funs('array|number*', function (nums) {
                 return nums;
             });
 
@@ -1488,7 +1488,7 @@ describe('argue', function () {
         });
 
         it('router that only needs the first arg', function () {
-            var router = argue('string, any*', function (url, etc) {
+            var router = funs('string, any*', function (url, etc) {
                 if (url === '/test') {
                     return etc[0];
                 }
@@ -1504,7 +1504,7 @@ describe('argue', function () {
         });
 
         it('map that takes any but a mapper that does not', function () {
-            var map = argue('array, function', function (arr, cb) {
+            var map = funs('array, function', function (arr, cb) {
                 var results = []
                 for(var i = 0; i < arr.length; i++) {
                     results.push(cb(arr[i]));
@@ -1512,14 +1512,14 @@ describe('argue', function () {
             });
 
             expect(function () {
-                map([2, 'this', 'will', 'blow'], argue('number', function (num) {
+                map([2, 'this', 'will', 'blow'], funs('number', function (num) {
                     return num * num;
                 }));
             }).to.throw(Error);
         });
 
         it('could model itself', function () {
-            var thisLib = argue('string?, function, object?', function (pattern, func, opts) {
+            var thisLib = funs('string?, function, object?', function (pattern, func, opts) {
 
             });
 
@@ -1532,7 +1532,7 @@ describe('argue', function () {
         });
         
         it('async request with callback', function () {
-            var request = argue('string, callback', function (url, callback) {
+            var request = funs('string, callback', function (url, callback) {
                 throw new Error('something went wrong');
             });
 

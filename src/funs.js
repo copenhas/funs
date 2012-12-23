@@ -15,7 +15,7 @@
 
     function argToArray(args) {
         if (getType(args) !== 'arguments') {
-            throw new Error('argue: argue.toArray() only accepts Arguments objects');
+            throw new Error('funs: funs.toArray() only accepts Arguments objects');
         }
         return Array.prototype.slice.call(args);
     }
@@ -55,7 +55,7 @@
                 return 1;
             }
 
-            throw new Error('argue: was expecting an ' + parser.desc + ' at position ' + 
+            throw new Error('funs: was expecting an ' + parser.desc + ' at position ' + 
                             position + ' but got an ' + argType);
         };
 
@@ -67,11 +67,11 @@
     function callbackParser() {
         var parser = function (position, argsToParse, parsedArgs) {
             try {
-                return argue.types['function'](position, argsToParse, parsedArgs);
+                return funs.types['function'](position, argsToParse, parsedArgs);
             }
             catch (e) {
-                if (e.message.indexOf('argue:') === 0) {
-                    throw new Error('argue: was expecting a callback at position ' + position +
+                if (e.message.indexOf('funs:') === 0) {
+                    throw new Error('funs: was expecting a callback at position ' + position +
                                     ' but got a ' + getType(argsToParse[position]));
                 }
 
@@ -91,7 +91,7 @@
                 try {
                     parser(position, argsToParse, parserMatchedArgs);
                 } catch (e) {
-                    if (e.message.indexOf('argue:') !== 0) {
+                    if (e.message.indexOf('funs:') !== 0) {
                         throw e;
                     }
 
@@ -102,7 +102,7 @@
                     }
                 }
 
-                throw new Error('argue: expected ' + modifier.desc + ' at position ' + position);
+                throw new Error('funs: expected ' + modifier.desc + ' at position ' + position);
             };
 
             modifier.desc = 'anything besides ' + parser.desc;
@@ -115,7 +115,7 @@
 
         return function (parser) {
             if (maxNumber > 1 && parser.type === 'callback') {
-                throw new Error('argue: callback has special meaning and ' +
+                throw new Error('funs: callback has special meaning and ' +
                                 'there may only be a max of 1');
             }
 
@@ -135,7 +135,7 @@
                         currentPosition += consumedStep;
                         consumedTotal += consumedStep;
                     } catch (e) {
-                        if (e.message.indexOf('argue:') !== 0) {
+                        if (e.message.indexOf('funs:') !== 0) {
                             throw e;
                         }
 
@@ -171,7 +171,7 @@
                     return consumedTotal;
                 }
 
-                throw new Error("argue: was expected " + quantifier.desc + 
+                throw new Error("funs: was expected " + quantifier.desc + 
                                 " starting at position " + position);
             };
 
@@ -190,13 +190,13 @@
                     //return on the first one to succeed
                     return parsers[i](position, argsToParse, parsedToArgs);
                 } catch (e) {
-                    if (e.message.indexOf('argue:') !== 0) {
+                    if (e.message.indexOf('funs:') !== 0) {
                         throw e;
                     }
                 }
             }
 
-            throw new Error('argue: none of the alternatives matched, was expecting ' + 
+            throw new Error('funs: none of the alternatives matched, was expecting ' + 
                             desc + ' at position ' + position);
         };
 
@@ -226,7 +226,7 @@
                     position += currentParser(position, argsPassedIn, parsedArgs);
                 }
             } catch (e) {
-                if (e.message.indexOf('argue:') === 0 && 
+                if (e.message.indexOf('funs:') === 0 && 
                         opts.partial && i < argParsers.length) {
                     return createWrappedFunction(
                                 opts, argParsers.slice(i), callbackIndex - i, 
@@ -240,12 +240,12 @@
             }
 
             if (parsedArgs.length === 0 && argsPassedIn.length > 0) {
-                throw new Error('argue: incorrect argument combination, all arguments ' +
+                throw new Error('funs: incorrect argument combination, all arguments ' +
                                 'were optional but none of them matched the ones given');
             }
 
             if (position < argsPassedIn.length) {
-                throw new Error('argue: incorrect argument combination, all arguments ' +
+                throw new Error('funs: incorrect argument combination, all arguments ' +
                                 'were not able to be parsed');
             }
 
@@ -267,7 +267,7 @@
         bind: false
     };
 
-    var argue = function (argPattern, func, opts) {
+    var funs = function (argPattern, func, opts) {
         var patterns = [];
 
         if (typeof argPattern === 'function') {
@@ -279,13 +279,13 @@
         }
 
         if (typeof func !== 'function') {
-            throw new Error('argue: a function must be provided.');
+            throw new Error('funs: a function must be provided.');
         }
 
         opts = opts || {};
 
         if (typeof opts !== 'object') {
-            throw new Error('argue: final argument is an optional hash of options.');
+            throw new Error('funs: final argument is an optional hash of options.');
         }
 
         opts = createOptions(defaultOpts, opts);
@@ -294,7 +294,7 @@
             callbackIndex = -1;
 
         if (opts.bind && !opts.partial) {
-            throw new Error('argue: bind option can not be turned on without partial');
+            throw new Error('funs: bind option can not be turned on without partial');
         }
 
         patterns.forEach(function (pattern, index) {
@@ -307,19 +307,19 @@
                     modifier = null,
                     parser = null;
 
-                if (argue.modifiers[firstChar]) {
+                if (funs.modifiers[firstChar]) {
                     type = type.substr(1, type.length);
-                    modifier = argue.modifiers[firstChar];
+                    modifier = funs.modifiers[firstChar];
                 }
 
-                if (argue.quantifiers[lastChar]) {
+                if (funs.quantifiers[lastChar]) {
                     type = type.substr(0, type.length - 1);
-                    quantifier = argue.quantifiers[lastChar];
+                    quantifier = funs.quantifiers[lastChar];
                 }
 
-                parser = argue.types[type];
+                parser = funs.types[type];
                 if (!parser) {
-                    throw new Error('argue: invalid arguement pattern, "' + 
+                    throw new Error('funs: invalid arguement pattern, "' + 
                                     type + '" is an unknown type');
                 }
 
@@ -327,7 +327,7 @@
                     hasCallback = true;
                     callbackIndex = index;
                 } else if (parser.type === 'callback' && hasCallback) {
-                    throw new Error('argue: callbacks have special meaning and ' +
+                    throw new Error('funs: callbacks have special meaning and ' +
                                     'only one callback is allowed in a pattern. One was ' +
                                     'given as this ' + callbackIndex + ' argument pattern');
                 }
@@ -354,7 +354,7 @@
         return createWrappedFunction(opts, argParsers, callbackIndex, func, 0);
     };
 
-    argue.types = {
+    funs.types = {
         'object': typeParser('object'),
         'number': typeParser('number'),
         'array': typeParser('array'),
@@ -371,29 +371,29 @@
         'any': typeParser('any')
     };
 
-    argue.modifiers = {
+    funs.modifiers = {
         '^': besidesParser()
     };
 
-    argue.quantifiers = {
+    funs.quantifiers = {
         '?': quantifierParser(0, 1),
         '+': quantifierParser(1),
         '*': quantifierParser(0)
     };
 
-    argue.toArray = argToArray;
-    argue.getType = getType;
+    funs.toArray = argToArray;
+    funs.getType = getType;
 
     if (typeof module !== 'undefined' && typeof exports !== 'undefined') {
         //commonjs
-        module.exports = argue;
+        module.exports = funs;
     } else if (typeof define === 'function') {
         //amd
         define([], function () {
-            return argue;
+            return funs;
         });
     } else {
         //plain
-        global.argue = argue;
+        global.funs = funs;
     }
 })();

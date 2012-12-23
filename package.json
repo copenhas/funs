@@ -1,9 +1,9 @@
 {
-    "name": "argue",
+    "name": "funs",
     "version": "0.1.0",
     "description": "function building library that provides argument parsing and sanitization",
     "keywords": ["arguments", "parser", "functions"],
-    "main": "./src/argue",
+    "main": "./src/funs",
     "author": {
         "name": "Sean Copenhaver",
         "email": "sean.copenhaver@gmail.com"
@@ -20,8 +20,8 @@
     "license": "Apache 2.0",
     "repository": {
         "type": "git",
-        "url": "http://github.com/copenhas/argue.git"
+        "url": "http://github.com/copenhas/funs.git"
     },
-    "bugs": { "url": "https://github.com/copenhas/argue/issues" },
+    "bugs": { "url": "https://github.com/copenhas/funs/issues" },
     "engines": { "node": ">=0.8.8" }
 }
